@@ -9,7 +9,6 @@ Assumes Kinesthetic Demonstrations (experts directly manipulate Panda arm in `ba
 
 Note: Assumes that the robot always starts at the "home" position (`go_JointPosition` w/ default args).
 """
-from subprocess import call, Popen
 from tap import Tap
 
 import numpy as np
