@@ -159,7 +159,7 @@ def main():
                     # Resolved Rate Motion Control
                     qdot = resolved_rates(xdot, state['J'], scale=0.5)
 
-                    # Send joint-velocity command
+                    # Send Joint-Velocity Command
                     send2robot(conn, qdot)
 
     except (KeyboardInterrupt, ConnectionResetError, BrokenPipeError):
