@@ -29,7 +29,7 @@ class ArgumentParser(Tap):
     demonstration_path: str                                 # Path to Demonstration Storage Directory
 
     # Mode
-    mode: str = "naive"                                     # Mode for Playback in < naive | staggered | cubic >
+    mode: str = "no-sleep"                                  # Mode for Playback in < naive | staggered | cubic >
 
     # Selection Parameters
     index: int = 0                                          # Index of demonstration for playback (default: 0)
@@ -110,8 +110,10 @@ def replay():
 
     # Get States for Demonstration
     states = demonstrations[args.index]
-    true_joints, target_joints, idx = np.zeros(len(states), 7), np.zeros(len(states), 7), 0
+    true_joints, target_joints, idx = np.zeros((len(states), 7)), np.zeros((len(states), 7)), 0
     for (state, elapsed) in states:
+        print(f"Processing Index: {idx}")
+
         # Check if time between consecutive states is at least 0.1 seconds (assumes STEP_TIME in record.py = 0.1)
         assert elapsed >= STEP_TIME, "Time between consecutive states is less than 0.1 seconds"
 
@@ -120,14 +122,20 @@ def replay():
         assert state.ndim == 1 and state.size == 21, "Invalid state (Current state does not have 21 elements)!"
 
         # Get Current Robot State, and "Target" Robot State
-        true_joints[idx] = get_state(conn)[:7]
+        true_joints[idx] = get_state(conn)["q"][:7]
         target_joints[idx] = state[:7]
 
         # Extract velocity to send to robot
         qdot = state[7:14]
 
+
+        # No Sleep --> Extract Velocity from indexed state, and feed it to the robot immediately!
+        if args.mode in ["no-sleep"]:
+            # Extract Velocity and Send to Robot
+            send2robot(conn, qdot)
+
         # Naive --> Extract Velocity from indexed state, and feed it to the robot after assuming constant time!
-        if args.mode in ["naive"]:
+        elif args.mode in ["naive"]:
             # Sleep for Step Time
             time.sleep(STEP_TIME)
 
