@@ -159,7 +159,7 @@ def record():
                     curr_time = time.time()
                     if curr_time - start_time >= STEP_TIME:
                         # Add a Tuple of current state and time elapsed between previous and current state
-                        print(f"Recorded state index: {len(demo)}")
+                        print(f"Recorded State: {' | '.join(list(map(str, state[:7])))}\n")
                         demo.append((state, curr_time - start_time))
 
                         # Reset Start Time!
