@@ -19,6 +19,7 @@ import time
 
 # Constants
 STEP_TIME = 0.1
+EFFECTIVE_HERTZ = 30
 
 
 class ArgumentParser(Tap):
@@ -128,17 +129,8 @@ def replay():
         # Extract velocity to send to robot
         qdot = state[7:14]
 
-
-        # No Sleep --> Extract Velocity from indexed state, and feed it to the robot immediately!
-        if args.mode in ["no-sleep"]:
-            # Extract Velocity and Send to Robot
-            send2robot(conn, qdot)
-
-        # Naive --> Extract Velocity from indexed state, and feed it to the robot after assuming constant time!
-        elif args.mode in ["naive"]:
-            # Sleep for Step Time
-            time.sleep(STEP_TIME)
-
+        # Naive --> Extract Velocity from indexed state, and feed it to the robot immediately!
+        if args.mode in ["naive"]:
             # Extract Velocity and Send to Robot
             send2robot(conn, qdot)
 
@@ -147,8 +139,9 @@ def replay():
             # Sleep for Elapsed Time
             time.sleep(elapsed)
 
-            # Extract Velocity and Send to Robot
-            send2robot(conn, qdot)
+            for _ in range(EFFECTIVE_HERTZ):
+                # Extract Velocity and Send to Robot
+                send2robot(conn, qdot)
 
         idx += 1
 
@@ -160,6 +153,7 @@ def replay():
     plt.plot(mismatch)
     plt.xlabel("State Index")
     plt.ylabel("Euclidean Distance Between Target Joints and Replayed Joints")
+    plt.ylim([0, 5])
     plt.show()
 
 
