@@ -140,7 +140,6 @@ franka::JointVelocities VelocityController::operator()(const franka::RobotState&
 
     if (valread > 0) {
       std::stringstream ss(buffer);
-      std::cout << "ss: " << ss.str() << std::endl;
       bool first = false;
       while (not first) {
         std::string substr;
