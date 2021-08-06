@@ -24,7 +24,7 @@ import pygame
 
 
 # CONSTANTS
-STEP_TIME = 0.1                                             # Record Joint State every 0.1 Seconds -- IMPORTANT!
+STEP_TIME = 0.1  # Record Joint State every 0.1 Seconds -- IMPORTANT!
 
 
 class ArgumentParser(Tap):
@@ -129,7 +129,10 @@ def record():
 
         # Establish Initial Connection to Robot --> First connect, then spawn LibFranka Low-Level Process (./read_State)
         print("[*] Initializing Connection to Robot and Starting Read-State Loop...")
-        lf_process = Popen(f"~/libfranka/build/examples/read_State {args.robot_ip} {args.port}", shell=True)
+        lf_process = Popen(
+            f"~/libfranka/build/examples/read_State {args.robot_ip} {args.port}",
+            shell=True,
+        )
         conn = connect2robot(args.port)
 
         print("[*] Dropping into Demonstration Loop w/ Input Device Controller = Joystick\n")
@@ -185,10 +188,16 @@ def record():
                 lf_process.kill()
 
                 # Call Reset to Home Position --> libfranka/build/examples/go_JointPosition robot_ip
-                call(f"~/libfranka/build/examples/go_JointPosition {args.robot_ip}", shell=True)
+                call(
+                    f"~/libfranka/build/examples/go_JointPosition {args.robot_ip}",
+                    shell=True,
+                )
 
                 # Re-initialize LF ReadState & Socket Connection
-                lf_process = Popen(f"~/libfranka/build/examples/read_State {args.robot_ip} {args.port}", shell=True)
+                lf_process = Popen(
+                    f"~/libfranka/build/examples/read_State {args.robot_ip} {args.port}",
+                    shell=True,
+                )
                 conn = connect2robot(args.port)
 
         # Serialize and Save Demonstrations + Images

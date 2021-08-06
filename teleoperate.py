@@ -17,7 +17,7 @@ import os
 import time
 
 # Suppress PyGame Import Text
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 
 # End-Effector Map
@@ -54,11 +54,11 @@ def resolved_rates(xdot, j, scale=1.0):
 
 
 # Robot Control Functions
-def connect2robot(PORT):
+def connect2robot(port):
     """ Open a Socket Connection to the Low-Level Controller """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('localhost', PORT))
+    s.bind(("localhost", port))
     s.listen()
     conn, addr = s.accept()
     return conn
@@ -70,7 +70,7 @@ def send2robot(conn, qdot, limit=1.5):
     scale = np.linalg.norm(qdot)
     if scale > limit:
         qdot = np.asarray([qdot[i] * limit / scale for i in range(7)])
-    send_msg = np.array2string(qdot, precision=5, separator=',', suppress_small=True)[1:-1]
+    send_msg = np.array2string(qdot, precision=5, separator=",", suppress_small=True)[1:-1]
     send_msg = "s," + send_msg + ","
     conn.send(send_msg.encode())
 
@@ -82,20 +82,20 @@ def listen2robot(conn):
     state_str = list(state_message.split(","))
     for idx in range(len(state_str)):
         if state_str[idx] == "s":
-            state_str = state_str[idx + 1:idx + 1 + state_length]
+            state_str = state_str[idx + 1 : idx + 1 + state_length]
             break
 
     try:
         state_vector = [float(item) for item in state_str]
-        assert(len(state_vector) == state_length)
+        assert len(state_vector) == state_length
     except (ValueError, AssertionError):
         return None
 
     state = {
-        'q': np.asarray(state_vector[0:7]),
-        'dq': np.asarray(state_vector[7:14]),
-        'tau': np.asarray(state_vector[14:21]),
-        'J': np.array(state_vector[21:]).reshape(7, 6).T
+        "q": np.asarray(state_vector[0:7]),
+        "dq": np.asarray(state_vector[7:14]),
+        "tau": np.asarray(state_vector[14:21]),
+        "J": np.array(state_vector[21:]).reshape(7, 6).T,
     }
 
     return state
@@ -113,14 +113,14 @@ def get_state(conn):
 # Main Teleoperation Code
 def main():
     # Parse Arguments
-    print('[*] Starting up...')
-    print("\t[*] \"I'm rooting for the machines.\" (Claude Shannon)")
+    print("[*] Starting up...")
+    print('\t[*] "I\'m rooting for the machines." (Claude Shannon)')
 
     # Connect to Gamepad, Robot
-    print('\n[*] Connecting to Gamepad...')
+    print("\n[*] Connecting to Gamepad...")
     joystick = JoystickControl()
 
-    print('[*] Connecting to Low-Level Controller...')
+    print("[*] Connecting to Low-Level Controller...")
     conn = connect2robot(8080)
 
     # Enter Control Loop
@@ -157,7 +157,7 @@ def main():
                     xdot[toggle + 1] = z[1]
 
                     # Resolved Rate Motion Control
-                    qdot = resolved_rates(xdot, state['J'], scale=0.5)
+                    qdot = resolved_rates(xdot, state["J"], scale=0.5)
 
                     # Send Joint-Velocity Command
                     send2robot(conn, qdot)
