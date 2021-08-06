@@ -92,15 +92,18 @@ def record():
     # Switch on Mode
     if args.mode in ["stream"]:
         # Enter Loop and Print Joint States (on a set interval)
+        start_time = time.time()
         while True:
             # Read State and get Joint Values
             state = get_state(conn)[:7]
 
             # Print State every second
-            print(f"Joint State: {' | '.join(list(state))}\n")
+            if time.time() - start_time > 1.0:
+                print(f"Joint State: {' | '.join(list(map(str, state)))}\n")
+                start_time = time.time()
 
             # Sleep for a Second
-            time.sleep(1)
+            # time.sleep(1)``
 
 
 if __name__ == "__main__":
